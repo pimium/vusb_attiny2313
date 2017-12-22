@@ -1,0 +1,15 @@
+johann_klopf.sublime-project
+johann_klopf.sublime-workspace
+*.eep
+*.elf
+*.hex
+*.i
+*.lss
+*.lst
+*.map
+**.o
+**.s
+**.sym
+Makefile_ubuntu
+NUL
+**.dep

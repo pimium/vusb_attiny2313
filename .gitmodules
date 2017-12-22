@@ -1,0 +1,3 @@
+[submodule "avr/v-usb"]
+	path = avr/v-usb
+	url = https://github.com/obdev/v-usb.git
