@@ -32,7 +32,7 @@ MCU = attiny2313
 #     processor frequency. You can then use this symbol in your source code to 
 #     calculate timings. Do NOT tack on a 'UL' at the end, this will be done
 #     automatically to create a 32-bit value in your source code.
-F_CPU = 4000000
+F_CPU = 12000000
 
 
 
@@ -41,7 +41,7 @@ TARGET =  main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+SRC = $(TARGET).c usbdrv.c oddebug.c
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -50,20 +50,20 @@ SRC = $(TARGET).c
 #     Even though the DOS/Win* filesystem matches both .s and .S the same,
 #     it will preserve the spelling of the filenames, and gcc itself does
 #     care about how the name is spelled on its command-line.
-#ASRC =
+ASRC = usbdrvasm.S
 
 
 # List any extra directories to look for include files here.
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS =
+EXTRAINCDIRS = v-usb/usbdrv/
 
 
 #specify alternate location of sources files
 #     (unlike VPATH= which is a search path for all prerequisites, not just source files)
-#vpath %.c /<directory>/
-#vpath %.S /<directory>/
+vpath %.c v-usb/usbdrv/
+vpath %.S v-usb/usbdrv/
 
 
 # Optimization level, can be [0, 1, 2, 3, s]. 

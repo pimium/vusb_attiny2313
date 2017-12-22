@@ -1,37 +1,41 @@
+
+#include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
 
-#define F_CPU 1000000UL  // 1 MHz
+#include "usbdrv.h"
 
-#define USB_CFG_IOPORTNAME      D
-#define USB_CFG_DMINUS_BIT      3
-#define USB_CFG_DPLUS_BIT       2
-#define USB_CFG_CLOCK_KHZ       12000
-
-#define USB_CFG_IS_SELF_POWERED         0
-#define USB_CFG_MAX_BUS_POWER           50
-
-#define  USB_CFG_VENDOR_ID       0xc0, 0x16 /* = 0x16c0 */
-#define  USB_CFG_DEVICE_ID       0xdc, 0x05 /* = 0x05dc */
-
-#define USB_CFG_DEVICE_VERSION  0x00, 0x01
-
-#define USB_CFG_VENDOR_NAME     'c', 'o', 'd', 'e', 'a', 'n', 'd', 'l', 'i', 'f', 'e', '.', 'c', 'o', 'm'
-#define USB_CFG_VENDOR_NAME_LEN 15
-
-#define USB_CFG_DEVICE_NAME     'U', 'S', 'B', 'e', 'x', 'a', 'm', 'p', 'l', 'e'
-#define USB_CFG_DEVICE_NAME_LEN 10
-
+#define F_CPU 12000000L
 #include <util/delay.h>
 
-int main() {
-        DDRB |= 1; // LED on PB0
-        
-        while(1) {
-                PORTB |= 1; // Turn LED on
-                _delay_ms(500);
-                PORTB &= ~1; // Turn LED off
-                _delay_ms(500);
-        }
+USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
+{
+  return 0; // do nothing for now
+}
 
-        return 1;
+int main()
+{
+  uchar i;
+
+  wdt_enable(WDTO_1S); // enable 1s watchdog timer
+
+  usbInit();
+
+  usbDeviceDisconnect(); // enforce re-enumeration
+  for (i = 0; i < 250; i++)
+  {              // wait 500 ms
+    wdt_reset(); // keep the watchdog happy
+    _delay_ms(2);
+  }
+  usbDeviceConnect();
+
+  sei(); // Enable interrupts after re-enumeration
+
+  while (1)
+  {
+    wdt_reset(); // keep the watchdog happy
+    usbPoll();
+  }
+
+  return 0;
 }
