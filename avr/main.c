@@ -8,14 +8,31 @@
 #define F_CPU 12000000L
 #include <util/delay.h>
 
+#define USB_LED_OFF 0
+#define USB_LED_ON 1
+
 USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
 {
-  return 0; // do nothing for now
+  usbRequest_t *rq = (void *)data; // cast data to correct type
+
+  switch (rq->bRequest)
+  { // custom command is in the bRequest field
+  case USB_LED_ON:
+    PORTB |= 1; // turn LED on
+    return 0;
+  case USB_LED_OFF:
+    PORTB &= ~1; // turn LED off
+    return 0;
+  default:
+    PORTB &= ~1; // turn LED off
+  }
+  return 0;
 }
 
 int main()
 {
   uchar i;
+  DDRB = 1; // PB0 as output
 
   wdt_enable(WDTO_1S); // enable 1s watchdog timer
 

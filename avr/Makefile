@@ -24,8 +24,9 @@
 
 
 # MCU name
-MCU = attiny2313
-
+MCU = atmega16
+#atmega8
+#attiny2313
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
