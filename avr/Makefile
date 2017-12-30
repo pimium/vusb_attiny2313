@@ -24,7 +24,8 @@
 
 
 # MCU name
-MCU = atmega16
+MCU = attiny2313
+#atmega16
 #atmega8
 #attiny2313
 
@@ -63,8 +64,8 @@ EXTRAINCDIRS = v-usb/usbdrv/
 
 #specify alternate location of sources files
 #     (unlike VPATH= which is a search path for all prerequisites, not just source files)
-vpath %.c v-usb/usbdrv/
-vpath %.S v-usb/usbdrv/
+# vpath %.c v-usb/usbdrv/
+# vpath %.S v-usb/usbdrv/
 
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
@@ -327,7 +328,7 @@ program: $(TARGET).hex $(TARGET).eep
 # Delete all generated files.
 clean:
 	@echo $(MSG_CLEANING)
-	$(REMOVE) $(TARGET).hex $(TARGET).eep $(TARGET).cof $(TARGET).elf $(TARGET).map $(TARGET).sym $(TARGET).lss $(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(SRC:.c=.i) .dep/
+	$(REMOVE) $(TARGET).hex $(TARGET).eep $(TARGET).cof $(TARGET).elf $(TARGET).map $(TARGET).sym $(TARGET).lss $(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(SRC:.c=.i) .dep/ *.lst 
 
 
 # Include the dependency files.
