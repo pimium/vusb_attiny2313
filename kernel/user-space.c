@@ -30,10 +30,10 @@ static void usage(char *name) {
   fprintf(
       stderr,
       "\nusage: %s [-mbslrudfch] [-t <msecs>]\n\n"
-      "  -m      missile launcher [/dev/ml0]\n"
+      "  -m      missile launcher [/dev/usbcheck]\n"
       "  -s      stop\n"
-      "  -l      turn left\n"
-      "  -r      turn right\n"
+      "  -l      turn LED off\n"
+      "  -r      turn LED on\n"
       "  -u      turn up\n"
       "  -d      turn down\n"
       "  -f      fire\n"
@@ -52,7 +52,7 @@ static void usage(char *name) {
 int main(int argc, char *argv[]) {
   char c;
   int fd;
-  char *cmd = malloc(sizeof(char));
+  char *cmd = malloc(sizeof(char)*8);
   int cvalue;
   char buffer[20];
   int duration = DEFAULT_DURATION;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
   }
 
   printf("Send command %i\n", cmd[0]);
-  send_cmd(fd, cmd, strlen(cmd));
+  send_cmd(fd, cmd, 8);
 
   // if (cmd & ML_FIRE)
   // 	duration = ML_FIRE_DELAY;

@@ -31,10 +31,10 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
   switch (rq->bRequest)
   { // custom command is in the bRequest field
   case USB_LED_ON:
-    PORTD |= (1 << PD6); // turn LED on
+    PORTD |= (1 << PD5); // turn LED on
     return 0;
   case USB_LED_OFF:
-    PORTD &= ~(1 << PD6); // turn LED off
+    PORTD &= ~(1 << PD5); // turn LED off
     return 0;
   case USB_DATA_OUT: // send data to PC
     usbMsgPtr = &(replyBuf[rq->wIndex.bytes[0]]);
@@ -52,11 +52,11 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
     if (dataLength > sizeof(replyBuf)) // limit to buffer size
       dataLength = sizeof(replyBuf);
 
-    PORTD ^= (1 << PD6); // turn LED on
+    PORTD ^= (1 << PD5); // turn LED on
     return USB_NO_MSG;   // usbFunctionWrite will be called now
 
   default:
-    PORTD ^= (1 << PD6); // turn LED on
+    PORTD ^= (1 << PD5); // turn LED on
   }
 
   return 0; // should not get here
@@ -77,8 +77,8 @@ int main()
 {
   uchar i;
 
-  DDRD = (1 << PD6);   // PD6 as output
-  PORTD |= (1 << PD6); // turn LED on
+  DDRD = (1 << PD5);   // PD5 as output
+  PORTD |= (1 << PD5); // turn LED on
 
   wdt_enable(WDTO_1S); // enable 1s watchdog timer
 

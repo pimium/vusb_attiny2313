@@ -163,7 +163,7 @@ U 1 1 5A3E684C
 P 1650 1550
 F 0 "J1" H 1705 2017 50  0000 C CNN
 F 1 "USB_B_Micro" H 1705 1926 50  0000 C CNN
-F 2 "Connectors:USB_Mini-B" H 1800 1500 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 1800 1500 50  0001 C CNN
 F 3 "~" H 1800 1500 50  0001 C CNN
 	1    1650 1550
 	1    0    0    -1  
@@ -218,7 +218,7 @@ Wire Wire Line
 Wire Wire Line
 	2850 1650 2600 1650
 Wire Wire Line
-	1950 1350 2200 1350
+	1950 1350 2100 1350
 $Comp
 L device:C_Small C6
 U 1 1 5A3E725E
@@ -612,19 +612,6 @@ Wire Wire Line
 Wire Wire Line
 	7500 2450 7500 2550
 $Comp
-L Switch:SW_SPST SW1
-U 1 1 5A423A7A
-P 2400 1350
-F 0 "SW1" H 2400 1585 50  0000 C CNN
-F 1 "SW_SPST" H 2400 1494 50  0000 C CNN
-F 2 "Buttons_Switches_THT:Nidec_Copal_SH-7010C" H 2400 1350 50  0001 C CNN
-F 3 "" H 2400 1350 50  0001 C CNN
-	1    2400 1350
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2600 1350 3600 1350
-$Comp
 L Connector:Conn_01x10 J3
 U 1 1 5A423FF6
 P 10700 2300
@@ -662,10 +649,6 @@ Wire Wire Line
 	9800 3400 9450 3400
 Wire Wire Line
 	9800 3500 9450 3500
-Wire Wire Line
-	6550 2700 6750 2700
-Wire Wire Line
-	6750 2250 6750 2700
 $Comp
 L Connector:Conn_01x04 J2
 U 1 1 5A4059D7
@@ -678,33 +661,11 @@ F 3 "~" H 7250 2900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7500 3700 7500 2800
-Wire Wire Line
 	6750 2250 7200 2250
-Wire Wire Line
-	7500 2800 8450 2800
-Wire Wire Line
-	7600 2900 7600 4000
-Wire Wire Line
-	7600 2900 8450 2900
-Wire Wire Line
-	7700 4100 7700 3000
 Wire Wire Line
 	7700 3000 8450 3000
 Wire Wire Line
-	7800 3100 7800 4200
-Wire Wire Line
-	7800 3100 8450 3100
-Wire Wire Line
 	7050 3100 6550 3100
-Wire Wire Line
-	6550 4000 7600 4000
-Wire Wire Line
-	6550 4100 7700 4100
-Wire Wire Line
-	6550 4200 7800 4200
-Wire Wire Line
-	6550 3700 7500 3700
 Wire Wire Line
 	6550 3000 7050 3000
 Wire Wire Line
@@ -761,4 +722,87 @@ Wire Wire Line
 	10450 2900 10450 2800
 Wire Wire Line
 	10450 2800 10500 2800
+$Comp
+L Switch:SW_DIP_x03 SW2
+U 1 1 5A48211F
+P 2400 1350
+F 0 "SW2" H 2400 1817 50  0000 C CNN
+F 1 "SW_DIP_x03" H 2400 1726 50  0000 C CNN
+F 2 "Buttons_Switches_THT:SW_PUSH_x2" H 2400 1350 50  0001 C CNN
+F 3 "" H 2400 1350 50  0001 C CNN
+	1    2400 1350
+	1    0    0    -1  
+$EndComp
+Connection ~ 2100 1350
+Connection ~ 2700 1350
+Wire Wire Line
+	2700 1350 3600 1350
+Wire Wire Line
+	2700 1350 2700 1250
+Wire Wire Line
+	2700 1250 2700 1150
+Connection ~ 2700 1250
+Wire Wire Line
+	2100 1150 2100 1250
+Wire Wire Line
+	2100 1250 2100 1350
+Connection ~ 2100 1250
+Text Label 6750 2250 0    50   ~ 0
+LED
+Text Label 7050 4100 2    50   ~ 0
+LED
+Wire Wire Line
+	7050 4100 6550 4100
+Wire Wire Line
+	6550 2700 7050 2700
+Text Label 7050 4200 2    50   ~ 0
+DATA_IN
+Text Label 7700 3000 0    50   ~ 0
+DATA_IN
+Text Label 7050 4000 2    50   ~ 0
+DATA_OUT
+Text Label 7700 3100 0    50   ~ 0
+DATA_OUT
+Wire Wire Line
+	7700 3100 8450 3100
+Wire Wire Line
+	7700 2900 8450 2900
+Wire Wire Line
+	7050 4200 6550 4200
+Text Label 7700 2900 0    50   ~ 0
+DATA_SCK
+Text Label 7050 2700 2    50   ~ 0
+DATA_SCK
+Text Label 7700 2800 0    50   ~ 0
+DATA_CS
+Wire Wire Line
+	7700 2800 8450 2800
+Text Label 7050 3700 2    50   ~ 0
+DATA_CS
+Wire Wire Line
+	6550 3700 7050 3700
+Wire Wire Line
+	6550 4000 7050 4000
+$Comp
+L Mechanical:Mounting_Hole MK2
+U 1 1 5A485C34
+P 1450 6350
+F 0 "MK2" H 1550 6396 50  0000 L CNN
+F 1 "Mounting_Hole" H 1550 6305 50  0000 L CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 1450 6350 50  0001 C CNN
+F 3 "" H 1450 6350 50  0001 C CNN
+	1    1450 6350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Mechanical:Mounting_Hole MK1
+U 1 1 5A485DC0
+P 1450 6100
+F 0 "MK1" H 1550 6146 50  0000 L CNN
+F 1 "Mounting_Hole" H 1550 6055 50  0000 L CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 1450 6100 50  0001 C CNN
+F 3 "" H 1450 6100 50  0001 C CNN
+	1    1450 6100
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
