@@ -1,4 +1,8 @@
 *.o
-*.mod.o
-*.mod.o.*
+*.mod
 *.ko
+*.mod.*
+*.cmd
+Module.symvers
+modules.order
+*sublime-*
