@@ -5,7 +5,7 @@ johann_klopf.sublime-workspace
 *.hex
 *.i
 *.lss
-*.lst
+**.lst
 *.map
 **.o
 **.s
