@@ -11,7 +11,10 @@
 
 #include "usbdrv.h"
 
+#ifndef F_CPU
 #define F_CPU 12000000L
+#endif
+
 #include <util/delay.h>
 
 #define USB_LED_OFF 0x30
