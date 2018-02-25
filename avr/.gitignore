@@ -14,3 +14,4 @@ Makefile_ubuntu
 NUL
 **.dep
 /.idea/
+/cmake-build-debug/
