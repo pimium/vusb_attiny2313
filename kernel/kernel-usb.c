@@ -23,7 +23,7 @@
 #include <linux/slab.h>  /* kmalloc() */
 #include <linux/usb.h>   /* USB stuff */
 
-#include <asm/uaccess.h> /* copy_*_user */
+#include <linux/uaccess.h> /* copy_*_user */
 
 #define USB_VENDOR_ID 0x16c0
 #define USB_DEVICE_ID 0x05dc
@@ -44,11 +44,16 @@ static ssize_t usbcheck_read(struct file *instanz, char *buffer, size_t count,
   int retval;
   __u16 *status = kmalloc(sizeof(__u16) * count, GFP_KERNEL);
 
+  __u8 *bulk_buf = kmalloc(sizeof(__u8) * 3, GFP_KERNEL);
+  if (copy_from_user(bulk_buf, buffer, 3)) {
+    return -EFAULT;
+  }
+
   mutex_lock(&ulock); /* Jetzt nicht disconnecten... */
   retval =
-      usb_control_msg(dev, usb_rcvctrlpipe(dev, 0), 0x02,
+      usb_control_msg(dev, usb_rcvctrlpipe(dev, 0), bulk_buf[0],
                       // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE,
-                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, 0, 0,
+                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, bulk_buf[1], bulk_buf[2],
                       (char *)status, sizeof(status), 5 * HZ);
 
   if (retval < 0) {
@@ -78,25 +83,29 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   int retval;
   int wrote_cnt = (cnt - MAX_PKT_SIZE);
   __u8 *bulk_buf = kmalloc(sizeof(__u8) * cnt, GFP_KERNEL);
+  __u8 *raw_data = bulk_buf + 3;
 
   if (copy_from_user(bulk_buf, buf, cnt)) {
     return -EFAULT;
   }
-  printk("Driver get command %s", buf);
+
+  printk("Driver get command %d", *buf);
+  // printk("Driver data %s", raw_data);
 
   /* Write the data into the bulk endpoint */
   retval =
-      usb_control_msg(dev, usb_sndctrlpipe(dev, 0), *bulk_buf,
-                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT, 0x3334,
-                      0x3536, bulk_buf, sizeof(bulk_buf) + 1, HZ * 5);
+      usb_control_msg(dev, usb_sndctrlpipe(dev, 0), bulk_buf[0],
+                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT, bulk_buf[1],
+                      // 0x3536, bulk_buf, sizeof(bulk_buf) + 1, HZ * 5);
+                      bulk_buf[1], raw_data, cnt-3, HZ * 5);
   if (retval < 0) {
     printk(KERN_ERR "usb_control_msg returned %d\n", retval);
     return retval;
   }
-  snprintf(pbuf, sizeof(pbuf), "bulk_buf=%d\n", *bulk_buf);
-  copy_from_user(bulk_buf, buf, 1);
-  printk("Driver Send command %d", *buf);
-  return wrote_cnt;
+  // snprintf(pbuf, sizeof(pbuf), "bulk_buf=%d\n", *bulk_buf);
+  // copy_from_user(bulk_buf, buf, 1);
+  // printk("Driver Send command %d", *buf);
+  return retval;
 }
 
 ssize_t usbcheck_write(struct file *instance, const char __user *buffer,

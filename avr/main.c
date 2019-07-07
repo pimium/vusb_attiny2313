@@ -17,14 +17,22 @@
 
 #include <util/delay.h>
 
-#define USB_LED_OFF 0x30
+#define USB_LED 0x30
 #define USB_LED_ON 0x31
-#define USB_DATA_OUT 2
+#define USB_DATA_READ 2
 #define USB_DATA_WRITE 3
-#define USB_DATA_IN 0x34
 
-static uchar replyBuf[20] = "Hello, USB!";
-static uchar dataReceived = 0, dataLength = 0; // for USB_DATA_IN
+#define MESSAGE_LENGTH 8
+#define RCLK PD4
+#define DATA PD6
+#define SRCLK PD5
+
+uchar replyBuf[20] = "Hello,USB!";
+int len;
+
+/* The following variables store the status of the current data transfer */
+volatile uchar currentAddress;
+volatile uchar bytesRemaining;
 
 // this gets called when custom control message is received
 USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
@@ -36,27 +44,27 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
   case USB_LED_ON:
     PORTD |= (1 << PD5); // turn LED on
     return 0;
-  case USB_LED_OFF:
-    PORTD &= ~(1 << PD5); // turn LED off
+  case USB_LED:
+    if (rq->wValue.bytes[0])
+      PORTD |= (1 << PD5); // turn LED on
+    else
+      PORTD &= ~(1 << PD5); // turn LED off
     return 0;
-  case USB_DATA_OUT: // send data to PC
-    usbMsgPtr = &(replyBuf[rq->wIndex.bytes[0]]);
-    return sizeof(replyBuf) - rq->wIndex.bytes[0];
-  case USB_DATA_WRITE: // modify reply buffer
-    replyBuf[4] = rq->wValue.bytes[0];
-    replyBuf[5] = rq->wValue.bytes[1];
-    replyBuf[6] = rq->wIndex.bytes[0];
-    replyBuf[7] = rq->wIndex.bytes[1];
-    return 0;
-  case USB_DATA_IN: // receive data from PC
-    dataLength = (uchar)rq->wLength.word;
-    dataReceived = 0;
-
-    if (dataLength > sizeof(replyBuf)) // limit to buffer size
-      dataLength = sizeof(replyBuf);
-
+  case USB_DATA_READ:           // send data to PC
+    DDRB = 0x00;
+    PORTB = 0xff;
+    len = 20;                   // we return up to 64 bytes
+    if (len > rq->wLength.word) // if the host requests less than we have
+      len = rq->wLength.word;   // return only the amount requested
+    usbMsgPtr = replyBuf;       // tell driver where the buffer starts
+    return len;                 // tell driver how many bytes to send
+  case USB_DATA_WRITE:          // receive data from PC
+    bytesRemaining = (uchar)rq->wLength.word;
+    if (bytesRemaining > 20)
+      bytesRemaining = 20;
+    currentAddress = 0;
     PORTD ^= (1 << PD5); // turn LED on
-    return USB_NO_MSG;   // usbFunctionWrite will be called now
+    return USB_NO_MSG;
 
   default:
     PORTD ^= (1 << PD5); // turn LED on
@@ -65,23 +73,48 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
   return 0; // should not get here
 }
 
-// This gets called when data is sent from PC to the device
+/* usbFunctionWrite() is called when the host sends a chunk of data to the
+ * device. For more information see the documentation in usbdrv/usbdrv.h.
+ */
 USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
 {
-  uchar i;
+  if (bytesRemaining == 0)
+    return 1; /* end of transfer */
+  if (len > bytesRemaining)
+    len = bytesRemaining;
+  for (int i = 0; i < len; ++i)
+  {
+    replyBuf[currentAddress + i] = data[i];
+  }
+  currentAddress += len;
+  bytesRemaining -= len;
+  return bytesRemaining == 0; /* return 1 if this was the last chunk */
+}
 
-  for (i = 0; dataReceived < dataLength && i < len; i++, dataReceived++)
-    replyBuf[dataReceived] = data[i];
+void vfd_write_byte(uint8_t byte)
+{
+    int i = MESSAGE_LENGTH;
+    do
+    {
+        if (byte & 0x01)
+            PORTD |= (1 << DATA);
+        else
+            PORTD &= ~(1 << DATA);
 
-  return (dataReceived == dataLength); // 1 if we received it all, 0 if not
+        PORTD &= ~(1 << SRCLK);
+        byte = byte >> 1;
+        i--;
+
+        PORTD |= (1 << SRCLK);
+    } while (i > 0);
 }
 
 int main()
 {
   uchar i;
 
-  DDRD = (1 << PD5);   // PD5 as output
-  PORTD |= (1 << PD5); // turn LED on
+  DDRD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
+  PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
 
   wdt_enable(WDTO_1S); // enable 1s watchdog timer
 
@@ -95,13 +128,13 @@ int main()
   }
   usbDeviceConnect();
 
-  sei(); // Enable interrupts after re-enumeration
+  sei();               // Enable interrupts after re-enumeration
+  PORTD |= (1 << PD5); // turn LED on
 
   while (1)
   {
     wdt_reset(); // keep the watchdog happy
     usbPoll();
   }
-
   return 0;
 }

@@ -113,10 +113,10 @@ if(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
 endif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-   set(CMAKE_C_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf")
-   set(CMAKE_CXX_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf")
+   set(CMAKE_C_FLAGS_DEBUG "-Os -save-temps -g -gdwarf-3 -gstrict-dwarf")
+   set(CMAKE_CXX_FLAGS_DEBUG "-Os -save-temps -g -gdwarf-3 -gstrict-dwarf")
    set(CMAKE_ASM_FLAGS_DEBUG "-DF_CPU=${MCU_SPEED} -x assembler-with-cpp -Wa,-gdwarf2")
-   SET(CMAKE_ASM_FLAGS_DEBUG "-O0 -save-temps -g -gdwarf-3 -gstrict-dwarf -x assembler-with-cpp")
+   SET(CMAKE_ASM_FLAGS_DEBUG "-Os -save-temps -g -gdwarf-3 -gstrict-dwarf -x assembler-with-cpp")
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
 ##################################################################################
