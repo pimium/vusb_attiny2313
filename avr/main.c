@@ -23,15 +23,17 @@
 #define USB_DATA_WRITE 3
 
 #define MESSAGE_LENGTH 8
-#define RCLK PD4
-#define DATA PD6
-#define SRCLK PD5
+#define RCLK PD0
+#define DATA PD4
+#define SRCLK PD1
+
+void vfd_write_byte(uint8_t byte);
 
 uchar replyBuf[20] = "Hello,USB!";
 int len;
+uint32_t address;
 
 /* The following variables store the status of the current data transfer */
-volatile uchar currentAddress;
 volatile uchar bytesRemaining;
 
 // this gets called when custom control message is received
@@ -50,7 +52,7 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
     else
       PORTD &= ~(1 << PD5); // turn LED off
     return 0;
-  case USB_DATA_READ:           // send data to PC
+  case USB_DATA_READ: // send data to PC
     DDRB = 0x00;
     PORTB = 0xff;
     len = 20;                   // we return up to 64 bytes
@@ -60,10 +62,23 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
     return len;                 // tell driver how many bytes to send
   case USB_DATA_WRITE:          // receive data from PC
     bytesRemaining = (uchar)rq->wLength.word;
-    if (bytesRemaining > 20)
-      bytesRemaining = 20;
-    currentAddress = 0;
-    PORTD ^= (1 << PD5); // turn LED on
+    //    address = (uchar)rq->wIndex.bytes[0];
+    //    address = (address << 8) + (uchar)rq->wIndex.bytes[1];
+    //    address = (address << 8) + (uchar)rq->wIndex.bytes[0];
+    PORTD &= ~(1 << SRCLK);
+    PORTD |= (1 << RCLK);
+    PORTD &= ~(1 << RCLK);
+    vfd_write_byte(rq->wIndex.bytes[0]);
+    vfd_write_byte(rq->wValue.bytes[1]);
+    vfd_write_byte(rq->wValue.bytes[0]);
+    //    vfd_write_byte(0x37);
+    //          vfd_write_byte(0x57);
+    //          vfd_write_byte(0x18);
+    PORTD |= (1 << RCLK);
+
+    if (bytesRemaining > 2)
+      bytesRemaining = 2;
+    PORTD ^= (1 << PD5);
     return USB_NO_MSG;
 
   default:
@@ -78,43 +93,38 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
  */
 USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
 {
-  if (bytesRemaining == 0)
-    return 1; /* end of transfer */
-  if (len > bytesRemaining)
-    len = bytesRemaining;
-  for (int i = 0; i < len; ++i)
-  {
-    replyBuf[currentAddress + i] = data[i];
-  }
-  currentAddress += len;
-  bytesRemaining -= len;
-  return bytesRemaining == 0; /* return 1 if this was the last chunk */
+  DDRB = 0xFF;
+  PORTB = data[0];
+  PORTD ^= (1 << PD6);
+  vfd_write_byte(0xf0);
+  return 1; /* return 1 if this was the last chunk */
 }
 
 void vfd_write_byte(uint8_t byte)
 {
-    int i = MESSAGE_LENGTH;
-    do
-    {
-        if (byte & 0x01)
-            PORTD |= (1 << DATA);
-        else
-            PORTD &= ~(1 << DATA);
+  int i = MESSAGE_LENGTH;
+  do
+  {
+    if (byte & 0x01)
+      PORTD |= (1 << DATA);
+    else
+      PORTD &= ~(1 << DATA);
 
-        PORTD &= ~(1 << SRCLK);
-        byte = byte >> 1;
-        i--;
+    PORTD &= ~(1 << SRCLK);
+    byte = byte >> 1;
+    i--;
 
-        PORTD |= (1 << SRCLK);
-    } while (i > 0);
+    PORTD |= (1 << SRCLK);
+  } while (i > 0);
+  PORTD &= ~(1 << SRCLK);
 }
 
 int main()
 {
   uchar i;
 
-  DDRD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
-  PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
+  DDRD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
+  PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
 
   wdt_enable(WDTO_1S); // enable 1s watchdog timer
 

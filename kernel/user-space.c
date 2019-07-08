@@ -19,10 +19,10 @@
 
 typedef struct {
   char cmd;
-  char index0;
-  char index1;
-  char data[8];
-}usb_msg_t;
+  uint16_t value;
+  char index;
+  char data[2];
+} usb_msg_t;
 
 void send_cmd(int fd, char *cmd, int count) {
   int retval = 0;
@@ -77,9 +77,9 @@ int main(int argc, char *argv[]) {
       break;
     case 'l':
       cvalue = atoi(optarg);
-      
+
       cmd[0] = ML_LED;
-      if(cvalue == 0)
+      if (cvalue == 0)
         cmd[1] = 0;
       else
         cmd[1] = 1;
@@ -89,10 +89,10 @@ int main(int argc, char *argv[]) {
       break;
     case 'u':
       usb_msg.cmd = ML_READ_BYTE;
-      usb_msg.index0 = 0x33;
-      usb_msg.index1 = 0x34;
+      usb_msg.value = 0x33;
+      usb_msg.index = 0x34;
       usb_msg.data[0] = 0;
-      memcpy(buffer, (const char*) &usb_msg, sizeof(usb_msg_t));
+      memcpy(buffer, (const char *)&usb_msg, sizeof(usb_msg_t));
       cvalue = atoi(optarg);
       printf("Open device %s\n", dev);
       fd = open(dev, O_RDWR);
@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) {
       break;
     case 'd':
       usb_msg.cmd = ML_WRITE_BYTE;
-      usb_msg.index0 = 0x33;
-      usb_msg.index1 = 0x34;
-      strncpy (usb_msg.data, optarg, 8 );
-      memcpy(cmd, (const char*) &usb_msg, sizeof(usb_msg_t));
+      usb_msg.value = 0x3233;
+      usb_msg.index = 0x0034;
+      strncpy(usb_msg.data, optarg, 2);
+      memcpy(cmd, (const char *)&usb_msg, sizeof(usb_msg_t));
       // cvalue = atoi(optarg);
 
       printf("Open device %s\n", dev);
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
       }
 
       printf("Send command %i\n", cmd[0]);
-      send_cmd(fd, cmd, 8+3);
+      send_cmd(fd, cmd, 2 + 4 + 1);
       close(fd);
       // // if (retval != 16)
       // fprintf(stderr, "number of bytes read = %d\n", retval);
@@ -167,7 +167,8 @@ int main(int argc, char *argv[]) {
       if (optopt == 'u')
         fprintf(stderr, "Option -%c requires an argument.\n", optopt);
       else if (optopt == 'l')
-        fprintf(stderr, "Option -%c requires an argument: On = 1, Off = 0.\n", optopt);
+        fprintf(stderr, "Option -%c requires an argument: On = 1, Off = 0.\n",
+                optopt);
       else if (isprint(optopt))
         fprintf(stderr, "Unknown option `-%c'.\n", optopt);
       else

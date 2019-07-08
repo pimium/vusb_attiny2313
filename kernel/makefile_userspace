@@ -1,0 +1,4 @@
+
+default: user-space.c
+	gcc -c user-space.c
+	gcc user-space.o -o user-space
