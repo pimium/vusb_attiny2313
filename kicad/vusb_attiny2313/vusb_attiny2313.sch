@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L atmel:ATTINY2313-20PU U2
+L vusb_attiny2313-rescue:ATTINY2313-20PU-atmel U2
 U 1 1 5A3E5479
 P 5400 3500
 F 0 "U2" H 5400 3450 50  0000 C CNN
@@ -26,18 +26,18 @@ F 3 "http://www.atmel.com/Images/doc2543.pdf" H 5400 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L regul:LM1117-1.8 U1
+L vusb_attiny2313-rescue:LM1117-1.8-regul U1
 U 1 1 5A3E55A4
 P 4050 1350
 F 0 "U1" H 4050 1592 50  0000 C CNN
-F 1 "LM1117-1.8" H 4050 1501 50  0000 C CNN
+F 1 "LM1117-3.3" H 4050 1501 50  0000 C CNN
 F 2 "TO_SOT_Packages_SMD:SOT-223-3_TabPin2" H 4050 1350 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/lm1117.pdf" H 4050 1350 50  0001 C CNN
 	1    4050 1350
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:Crystal_Small Y1
+L vusb_attiny2313-rescue:Crystal_Small-device Y1
 U 1 1 5A3E5771
 P 4000 3100
 F 0 "Y1" H 4000 3325 50  0000 C CNN
@@ -48,7 +48,7 @@ F 3 "" H 4000 3100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:C_Small C3
+L vusb_attiny2313-rescue:C_Small-device C3
 U 1 1 5A3E586E
 P 3650 3500
 F 0 "C3" H 3742 3546 50  0000 L CNN
@@ -59,7 +59,7 @@ F 3 "" H 3650 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:C_Small C4
+L vusb_attiny2313-rescue:C_Small-device C4
 U 1 1 5A3E590E
 P 4000 3500
 F 0 "C4" H 4092 3546 50  0000 L CNN
@@ -70,7 +70,7 @@ F 3 "" H 4000 3500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L atmel:AVR-ISP-6 ISP1
+L vusb_attiny2313-rescue:AVR-ISP-6-atmel ISP1
 U 1 1 5A3E59A3
 P 1550 4600
 F 0 "ISP1" H 1320 4696 50  0000 R CNN
@@ -81,7 +81,7 @@ F 3 "" H 275 4050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:R_Small R4
+L vusb_attiny2313-rescue:R_Small-device R4
 U 1 1 5A3E5B40
 P 3100 1150
 F 0 "R4" H 3159 1196 50  0000 L CNN
@@ -92,7 +92,7 @@ F 3 "" H 3100 1150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:R_Small R3
+L vusb_attiny2313-rescue:R_Small-device R3
 U 1 1 5A3E5BC7
 P 2850 1150
 F 0 "R3" H 2909 1196 50  0000 L CNN
@@ -103,7 +103,7 @@ F 3 "" H 2850 1150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:R_Small R1
+L vusb_attiny2313-rescue:R_Small-device R1
 U 1 1 5A3E5C29
 P 2200 1550
 F 0 "R1" V 2200 1550 50  0000 C CNN
@@ -114,7 +114,7 @@ F 3 "" H 2200 1550 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:R_Small R2
+L vusb_attiny2313-rescue:R_Small-device R2
 U 1 1 5A3E5CDB
 P 2500 1650
 F 0 "R2" V 2500 1650 50  0000 C CNN
@@ -125,7 +125,7 @@ F 3 "" H 2500 1650 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L device:CP1_Small C2
+L vusb_attiny2313-rescue:CP1_Small-device C2
 U 1 1 5A3E5D76
 P 3600 1600
 F 0 "C2" H 3691 1646 50  0000 L CNN
@@ -136,7 +136,7 @@ F 3 "" H 3600 1600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:CP1_Small C5
+L vusb_attiny2313-rescue:CP1_Small-device C5
 U 1 1 5A3E5F04
 P 4600 1600
 F 0 "C5" H 4691 1646 50  0000 L CNN
@@ -147,7 +147,7 @@ F 3 "" H 4600 1600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:R_Small R5
+L vusb_attiny2313-rescue:R_Small-device R5
 U 1 1 5A3E5F38
 P 3350 2500
 F 0 "R5" H 3409 2546 50  0000 L CNN
@@ -220,7 +220,7 @@ Wire Wire Line
 Wire Wire Line
 	1950 1350 2100 1350
 $Comp
-L device:C_Small C6
+L vusb_attiny2313-rescue:C_Small-device C6
 U 1 1 5A3E725E
 P 5000 1600
 F 0 "C6" H 5092 1646 50  0000 L CNN
@@ -332,7 +332,7 @@ Wire Wire Line
 Wire Wire Line
 	3350 2700 4250 2700
 $Comp
-L device:C_Small C1
+L vusb_attiny2313-rescue:C_Small-device C1
 U 1 1 5A3E918A
 P 3350 2900
 F 0 "C1" H 3442 2946 50  0000 L CNN
@@ -494,17 +494,6 @@ Text Label 6850 3800 2    50   ~ 0
 D+
 Text Label 6850 3900 2    50   ~ 0
 D-
-$Comp
-L microchip:MCP23S17 U3
-U 1 1 5A3F3039
-P 8950 2700
-F 0 "U3" H 8950 2850 50  0000 C CNN
-F 1 "MCP23S17" H 8950 2700 50  0000 C CNN
-F 2 "Housings_DIP:DIP-28_W7.62mm_LongPads" H 9000 1750 50  0001 L CNN
-F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/20001952C.pdf" H 9200 3700 50  0001 C CNN
-	1    8950 2700
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	8450 2400 8000 2400
 Wire Wire Line
@@ -555,7 +544,7 @@ F 3 "" H 7500 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L device:R_Small R6
+L vusb_attiny2313-rescue:R_Small-device R6
 U 1 1 5A400338
 P 7500 1400
 F 0 "R6" H 7559 1446 50  0000 L CNN
@@ -568,7 +557,7 @@ $EndComp
 Wire Wire Line
 	7500 1200 7500 1300
 $Comp
-L device:LED_Small D1
+L vusb_attiny2313-rescue:LED_Small-device D1
 U 1 1 5A40196B
 P 7500 1700
 F 0 "D1" V 7546 1632 50  0000 R CNN
@@ -590,7 +579,7 @@ F 3 "" H 7500 2550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Transistor:BSS138 Q1
+L vusb_attiny2313-rescue:BSS138-Transistor Q1
 U 1 1 5A406ED6
 P 7400 2250
 F 0 "Q1" H 7605 2296 50  0000 L CNN
@@ -612,18 +601,7 @@ Wire Wire Line
 Wire Wire Line
 	7500 2450 7500 2550
 $Comp
-L Connector:Conn_01x10 J3
-U 1 1 5A423FF6
-P 10700 2300
-F 0 "J3" H 10780 2292 50  0000 L CNN
-F 1 "PORT B" H 10780 2201 50  0000 L CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x10_Pitch2.54mm" H 10700 2300 50  0001 C CNN
-F 3 "~" H 10700 2300 50  0001 C CNN
-	1    10700 2300
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:Conn_01x08 J4
+L vusb_attiny2313-rescue:Conn_01x08-Connector J4
 U 1 1 5A4240DB
 P 10000 3100
 F 0 "J4" H 10080 3092 50  0000 L CNN
@@ -650,7 +628,7 @@ Wire Wire Line
 Wire Wire Line
 	9800 3500 9450 3500
 $Comp
-L Connector:Conn_01x04 J2
+L vusb_attiny2313-rescue:Conn_01x04-Connector J2
 U 1 1 5A4059D7
 P 7250 2900
 F 0 "J2" H 7200 3100 50  0000 L CNN
@@ -698,22 +676,6 @@ F 3 "" H 10300 2900 50  0001 C CNN
 	1    10300 2900
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9450 1900 10500 1900
-Wire Wire Line
-	9450 2000 10500 2000
-Wire Wire Line
-	9450 2100 10500 2100
-Wire Wire Line
-	9450 2200 10500 2200
-Wire Wire Line
-	9450 2300 10500 2300
-Wire Wire Line
-	9450 2400 10500 2400
-Wire Wire Line
-	9450 2500 10500 2500
-Wire Wire Line
-	9450 2600 10500 2600
 Wire Wire Line
 	10300 2900 10300 2700
 Wire Wire Line
@@ -784,7 +746,7 @@ Wire Wire Line
 Wire Wire Line
 	6550 4000 7050 4000
 $Comp
-L Mechanical:Mounting_Hole MK2
+L vusb_attiny2313-rescue:Mounting_Hole-Mechanical MK2
 U 1 1 5A485C34
 P 1450 6350
 F 0 "MK2" H 1550 6396 50  0000 L CNN
@@ -795,7 +757,7 @@ F 3 "" H 1450 6350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK1
+L vusb_attiny2313-rescue:Mounting_Hole-Mechanical MK1
 U 1 1 5A485DC0
 P 1450 6100
 F 0 "MK1" H 1550 6146 50  0000 L CNN
@@ -805,4 +767,67 @@ F 3 "" H 1450 6100 50  0001 C CNN
 	1    1450 6100
 	1    0    0    -1  
 $EndComp
+$Comp
+L Memory_EPROM:27C256 U?
+U 1 1 5D263362
+P 8950 2600
+F 0 "U?" H 8950 3878 50  0000 C CNN
+F 1 "27C256" H 8950 3787 50  0000 C CNN
+F 2 "Package_DIP:DIP-28_W15.24mm" H 8950 2600 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0014.pdf" H 8950 2600 50  0001 C CNN
+	1    8950 2600
+	1    0    0    -1  
+$EndComp
+Entry Wire Line
+	9550 1700 9650 1800
+Entry Wire Line
+	9550 1800 9650 1900
+Entry Wire Line
+	9550 1900 9650 2000
+Entry Wire Line
+	9550 2000 9650 2100
+Entry Wire Line
+	9550 2100 9650 2200
+Entry Wire Line
+	9550 2200 9650 2300
+Entry Wire Line
+	9550 2300 9650 2400
+Entry Wire Line
+	9550 2400 9650 2500
+Wire Wire Line
+	9350 1700 9550 1700
+Wire Bus Line
+	9650 1500 9650 2650
+Wire Wire Line
+	9350 1800 9550 1800
+Wire Wire Line
+	9350 1900 9550 1900
+Wire Wire Line
+	9350 2000 9550 2000
+Wire Wire Line
+	9350 2100 9550 2100
+Wire Wire Line
+	9350 2200 9550 2200
+Wire Wire Line
+	9350 2300 9550 2300
+Wire Wire Line
+	9350 2400 9550 2400
+Text Label 9400 1700 0    50   ~ 0
+D0
+Text Label 9400 1800 0    50   ~ 0
+D1
+Text Label 9400 1900 0    50   ~ 0
+D2
+Text Label 9400 2000 0    50   ~ 0
+D3
+Text Label 9400 2100 0    50   ~ 0
+D4
+Text Label 9400 2200 0    50   ~ 0
+D5
+Text Label 9400 2300 0    50   ~ 0
+D6
+Text Label 9400 2400 0    50   ~ 0
+D7
+Text Label 9650 1500 3    50   ~ 0
+D[0..7]
 $EndSCHEMATC
