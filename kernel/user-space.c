@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #define DEFAULT_DEVICE "/dev/usbcheck"
 #define DEFAULT_DURATION 800
@@ -20,7 +21,7 @@
 typedef struct {
   char cmd;
   uint16_t value;
-  char index;
+  uint16_t index;
   char data[2];
 } usb_msg_t;
 
@@ -64,7 +65,8 @@ int main(int argc, char *argv[]) {
   int duration = DEFAULT_DURATION;
   char *dev = DEFAULT_DEVICE;
   char *data;
-  usb_msg_t usb_msg = {ML_WRITE_BYTE, 0x33, 0x34, ""};
+  usb_msg_t usb_msg = {ML_WRITE_BYTE, 0x1143, 0x2254, ""};
+  uint8_t my_msg[sizeof(usb_msg_t)];
 
   opterr = 0;
   if (argc < 2)
@@ -108,7 +110,7 @@ int main(int argc, char *argv[]) {
       if (retval < 0)
         fprintf(stderr, "could not send command to fd=%d\n", fd);
       close(fd);
-      // if (retval != 16)
+
       fprintf(stderr, "number of bytes read = %d\n", retval);
       printf("receive: %s\n", buffer);
 
@@ -117,12 +119,14 @@ int main(int argc, char *argv[]) {
       return EXIT_SUCCESS;
       break;
     case 'd':
-      usb_msg.cmd = ML_WRITE_BYTE;
-      usb_msg.value = 0x3233;
-      usb_msg.index = 0x0034;
-      strncpy(usb_msg.data, optarg, 2);
-      memcpy(cmd, (const char *)&usb_msg, sizeof(usb_msg_t));
-      // cvalue = atoi(optarg);
+      my_msg[0] = ML_WRITE_BYTE;
+      my_msg[1] = 0x66;
+      my_msg[2] = 0x31;
+      my_msg[3] = 0x77;
+      my_msg[4] = 0x32;
+
+      strncpy(&(my_msg[5]), optarg, 2);
+
 
       printf("Open device %s\n", dev);
       fd = open(dev, O_RDWR);
@@ -132,18 +136,11 @@ int main(int argc, char *argv[]) {
       }
 
       printf("Send command %i\n", cmd[0]);
-      send_cmd(fd, cmd, 2 + 4 + 1);
+      send_cmd(fd, my_msg, sizeof(my_msg));
       close(fd);
-      // // if (retval != 16)
-      // fprintf(stderr, "number of bytes read = %d\n", retval);
-      // printf("receive: %s\n", buffer);
 
-      // close(fd);
       return EXIT_SUCCESS;
 
-      // // cmd = "optarg";
-      // strcpy(cmd, optarg);
-      // cmd[0] = ML_WRITE_BYTE;
       break;
     case 'f':
       cmd[0] = ML_FIRE;
@@ -187,14 +184,6 @@ int main(int argc, char *argv[]) {
 
   printf("Send command %i\n", cmd[0]);
   send_cmd(fd, cmd, 3);
-
-  // if (cmd & ML_FIRE)
-  //  duration = ML_FIRE_DELAY;
-  // else if (cmd == ML_READ_BYTE || cmd == ML_WRITE_BYTE)
-  //  duration /= 2;
-  // usleep(duration * 1000);
-
-  // send_cmd(fd, ML_STOP);
 
   close(fd);
 

@@ -83,16 +83,15 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   int retval;
   // int wrote_cnt = (cnt - MAX_PKT_SIZE);
   __u8 *bulk_buf = kmalloc(sizeof(__u8) * cnt, GFP_KERNEL);
-  __u8 *raw_data = bulk_buf + 5;
-  // int value = (*(bulk_buf + 1) << 8) + *(bulk_buf + 2);
-  // int index = (*(bulk_buf + 3) << 8) + *(bulk_buf + 4);
 
-  __u8 value = 0;
-  __u8 index = 0;
 
   if (copy_from_user(bulk_buf, buf, cnt)) {
     return -EFAULT;
   }
+
+  __u8 *raw_data = bulk_buf + 5;
+  __u16 value = (*(bulk_buf + 1) << 8) + *(bulk_buf + 2);
+  __u16 index = (*(bulk_buf + 3) << 8) + *(bulk_buf + 4);
 
   printk("Driver get command %d", *buf);
   // printk("Driver data %s", raw_data);
@@ -101,8 +100,7 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   retval =
       usb_control_msg(dev, usb_sndctrlpipe(dev, 0), bulk_buf[0],
                       USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT, value,
-                      // 0x3536, bulk_buf, sizeof(bulk_buf) + 1, HZ * 5);
-                      index, raw_data, cnt - 3, HZ * 5);
+                      index, raw_data, cnt - 5, HZ * 5);
   if (retval < 0) {
     printk(KERN_ERR "usb_control_msg returned %d\n", retval);
     return retval;
@@ -124,6 +122,7 @@ ssize_t usbcheck_write(struct file *instance, const char __user *buffer,
      */
     return -EAGAIN;
   }
+
   if (wait_event_interruptible(wq_write, WRITE_POSSIBLE)) {
     /* waehrend des Schlafens durch ein Signal unterbrochen */
     return -ERESTARTSYS;
