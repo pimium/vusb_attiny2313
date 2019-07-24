@@ -23,15 +23,19 @@
 #define USB_DATA_WRITE 3
 
 #define MESSAGE_LENGTH 8
-#define RCLK PD0
-#define DATA PD4
+#define RCLK PD4
+#define DATA PD0
 #define SRCLK PD1
+
+#define RAM_WE 0x40
+#define RAM_OE 0x80
+#define RAM_CE PD5
 
 void vfd_write_byte(uint8_t byte);
 
 uchar replyBuf[20] = "Hello,USB!";
 int len;
-uint32_t address;
+uint8_t address[2];
 
 /* The following variables store the status of the current data transfer */
 volatile uchar bytesRemaining;
@@ -39,53 +43,70 @@ volatile uchar bytesRemaining;
 // this gets called when custom control message is received
 USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
 {
-  usbRequest_t *rq = (void *)data; // cast data to correct type
+    usbRequest_t *rq = (void *)data; // cast data to correct type
 
-  switch (rq->bRequest)
-  { // custom command is in the bRequest field
-  case USB_LED_ON:
-    PORTD |= (1 << PD5); // turn LED on
-    return 0;
-  case USB_LED:
-    if (rq->wValue.bytes[0])
-      PORTD |= (1 << PD5); // turn LED on
-    else
-      PORTD &= ~(1 << PD5); // turn LED off
-    return 0;
-  case USB_DATA_READ: // send data to PC
-    DDRB = 0x00;
-    PORTB = 0xff;
-    len = 20;                   // we return up to 64 bytes
-    if (len > rq->wLength.word) // if the host requests less than we have
-      len = rq->wLength.word;   // return only the amount requested
-    usbMsgPtr = replyBuf;       // tell driver where the buffer starts
-    return len;                 // tell driver how many bytes to send
-  case USB_DATA_WRITE:          // receive data from PC
-    bytesRemaining = (uchar)rq->wLength.word;
-    //    address = (uchar)rq->wIndex.bytes[0];
-    //    address = (address << 8) + (uchar)rq->wIndex.bytes[1];
-    //    address = (address << 8) + (uchar)rq->wIndex.bytes[0];
-    PORTD &= ~(1 << SRCLK);
-    PORTD |= (1 << RCLK);
-    PORTD &= ~(1 << RCLK);
-    vfd_write_byte(rq->wIndex.bytes[0]);
-    vfd_write_byte(rq->wValue.bytes[1]);
-    vfd_write_byte(rq->wValue.bytes[0]);
-    //    vfd_write_byte(0x37);
-    //          vfd_write_byte(0x57);
-    //          vfd_write_byte(0x18);
-    PORTD |= (1 << RCLK);
+    switch (rq->bRequest)
+    { // custom command is in the bRequest field
+    case USB_LED_ON:
+        PORTD |= (1 << PD5); // turn LED on
+        return 0;
 
-    if (bytesRemaining > 2)
-      bytesRemaining = 2;
-    PORTD ^= (1 << PD5);
-    return USB_NO_MSG;
+    case USB_LED:
+        if (rq->wValue.bytes[0])
+            PORTD |= (1 << PD5); // turn LED on
+        else
+            PORTD &= ~(1 << PD5); // turn LED off
+        return 0;
 
-  default:
-    PORTD ^= (1 << PD5); // turn LED on
-  }
+    case USB_DATA_READ: // send data to PC
 
-  return 0; // should not get here
+        PORTD |= (1 << RAM_CE);
+        DDRB = 0x00;
+        PORTB = 0xFF;
+
+        PORTD &= ~(1 << SRCLK);
+        PORTD |= (1 << RCLK);
+        PORTD &= ~(1 << RCLK);
+        vfd_write_byte(RAM_OE | RAM_WE);
+        vfd_write_byte(rq->wValue.bytes[1]);
+        vfd_write_byte(rq->wValue.bytes[0]);
+        PORTD |= (1 << RCLK);
+
+        PORTD &= ~(1 << SRCLK);
+        PORTD |= (1 << RCLK);
+        PORTD &= ~(1 << RCLK);
+        vfd_write_byte(RAM_WE);
+        vfd_write_byte(rq->wValue.bytes[1]);
+        vfd_write_byte(rq->wValue.bytes[0]);
+        PORTD &= ~(1 << RAM_CE);
+        PORTD |= (1 << RCLK);
+
+        PORTD &= ~(1 << SRCLK);
+        PORTD |= (1 << RCLK);
+        PORTD &= ~(1 << RCLK);
+
+        replyBuf[0] = PINB;
+
+        vfd_write_byte(RAM_OE | RAM_WE);
+        vfd_write_byte(rq->wValue.bytes[1]);
+        vfd_write_byte(rq->wValue.bytes[0]);
+        PORTD |= (1 << RCLK);
+        PORTD |= (1 << RAM_CE);
+        usbMsgPtr = replyBuf;
+        return 1;
+
+    case USB_DATA_WRITE: // receive data from PC
+        bytesRemaining = (uchar)rq->wLength.word;
+        address[1] = rq->wValue.bytes[1];
+        address[0] = rq->wValue.bytes[0];
+
+        return USB_NO_MSG;
+
+    default:
+        return 0;
+    }
+
+    return 0; // should not get here
 }
 
 /* usbFunctionWrite() is called when the host sends a chunk of data to the
@@ -93,58 +114,88 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
  */
 USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
 {
-  DDRB = 0xFF;
-  PORTB = data[0];
-  PORTD ^= (1 << PD6);
-  vfd_write_byte(0xf0);
-  return 1; /* return 1 if this was the last chunk */
+    PORTD |= (1 << RAM_CE);
+    DDRB = 0xFF;
+    PORTB = data[0];
+
+    PORTD &= ~(1 << SRCLK);
+    PORTD |= (1 << RCLK);
+    PORTD &= ~(1 << RCLK);
+    vfd_write_byte(RAM_OE | RAM_WE);
+    vfd_write_byte(address[1]);
+    vfd_write_byte(address[0]);
+    PORTD |= (1 << RCLK);
+
+    PORTD &= ~(1 << SRCLK);
+    PORTD |= (1 << RCLK);
+    PORTD &= ~(1 << RCLK);
+    vfd_write_byte(RAM_OE);
+    vfd_write_byte(address[1]);
+    vfd_write_byte(address[0]);
+
+    PORTD &= ~(1 << RAM_CE);
+
+    PORTD |= (1 << RCLK);
+
+    PORTD &= ~(1 << SRCLK);
+    PORTD |= (1 << RCLK);
+    PORTD &= ~(1 << RCLK);
+    vfd_write_byte(RAM_OE | RAM_WE);
+    vfd_write_byte(address[1]);
+    vfd_write_byte(address[0]);
+    PORTD |= (1 << RCLK);
+
+    PORTD |= (1 << RAM_CE);
+
+    return 1; /* return 1 if this was the last chunk */
 }
 
 void vfd_write_byte(uint8_t byte)
 {
-  int i = MESSAGE_LENGTH;
-  do
-  {
-    if (byte & 0x01)
-      PORTD |= (1 << DATA);
-    else
-      PORTD &= ~(1 << DATA);
+    int i = MESSAGE_LENGTH;
+    do
+    {
+        if (byte & 0x01)
+            PORTD |= (1 << DATA);
+        else
+            PORTD &= ~(1 << DATA);
 
+        PORTD &= ~(1 << SRCLK);
+        byte = byte >> 1;
+        i--;
+
+        PORTD |= (1 << SRCLK);
+    } while (i > 0);
     PORTD &= ~(1 << SRCLK);
-    byte = byte >> 1;
-    i--;
-
-    PORTD |= (1 << SRCLK);
-  } while (i > 0);
-  PORTD &= ~(1 << SRCLK);
+    wdt_reset();
 }
 
 int main()
 {
-  uchar i;
+    uchar i;
 
-  DDRD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
-  PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
+    DDRD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
+    PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD0) | (1 << PD1);
 
-  wdt_enable(WDTO_1S); // enable 1s watchdog timer
+    wdt_enable(WDTO_1S); // enable 1s watchdog timer
 
-  usbInit();
+    usbInit();
 
-  usbDeviceDisconnect(); // enforce re-enumeration
-  for (i = 0; i < 250; i++)
-  {              // wait 500 ms
-    wdt_reset(); // keep the watchdog happy
-    _delay_ms(2);
-  }
-  usbDeviceConnect();
+    usbDeviceDisconnect(); // enforce re-enumeration
+    for (i = 0; i < 250; i++)
+    {                // wait 500 ms
+        wdt_reset(); // keep the watchdog happy
+        _delay_ms(2);
+    }
+    usbDeviceConnect();
 
-  sei();               // Enable interrupts after re-enumeration
-  PORTD |= (1 << PD5); // turn LED on
+    sei();               // Enable interrupts after re-enumeration
+    PORTD |= (1 << PD5); // turn LED on
 
-  while (1)
-  {
-    wdt_reset(); // keep the watchdog happy
-    usbPoll();
-  }
-  return 0;
+    while (1)
+    {
+        wdt_reset(); // keep the watchdog happy
+        usbPoll();
+    }
+    return 0;
 }

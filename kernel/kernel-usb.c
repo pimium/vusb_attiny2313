@@ -42,18 +42,21 @@ static ssize_t usbcheck_read(struct file *instanz, char *buffer, size_t count,
                              loff_t *ofs) {
   char pbuf[20];
   int retval;
-  __u16 *status = kmalloc(sizeof(__u16) * count, GFP_KERNEL);
+  __u8 *status = kmalloc(sizeof(__u16) * count, GFP_KERNEL);
 
-  __u8 *bulk_buf = kmalloc(sizeof(__u8) * 3, GFP_KERNEL);
-  if (copy_from_user(bulk_buf, buffer, 3)) {
+  __u8 *bulk_buf = kmalloc(sizeof(__u8) * 7, GFP_KERNEL);
+  if (copy_from_user(bulk_buf, buffer, 7)) {
     return -EFAULT;
   }
+
+  __u16 value = (*(bulk_buf + 2) << 8) + *(bulk_buf + 1);
+  __u16 index = (*(bulk_buf + 4) << 8) + *(bulk_buf + 3);
 
   mutex_lock(&ulock); /* Jetzt nicht disconnecten... */
   retval = usb_control_msg(
       dev, usb_rcvctrlpipe(dev, 0), bulk_buf[0],
       // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE,
-      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, bulk_buf[1], bulk_buf[2],
+      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, value, index,
       (char *)status, sizeof(status), 5 * HZ);
 
   if (retval < 0) {
@@ -66,6 +69,7 @@ static ssize_t usbcheck_read(struct file *instanz, char *buffer, size_t count,
   if (retval > count) {
     retval = count;
   }
+  memset(buffer, 0, count + 1);
   copy_to_user(buffer, status, retval);
 read_out:
   mutex_unlock(&ulock);
@@ -90,8 +94,8 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   }
 
   __u8 *raw_data = bulk_buf + 5;
-  __u16 value = (*(bulk_buf + 1) << 8) + *(bulk_buf + 2);
-  __u16 index = (*(bulk_buf + 3) << 8) + *(bulk_buf + 4);
+  __u16 value = (*(bulk_buf + 2) << 8) + *(bulk_buf + 1);
+  __u16 index = (*(bulk_buf + 4) << 8) + *(bulk_buf + 3);
 
   printk("Driver get command %d", *buf);
   // printk("Driver data %s", raw_data);
