@@ -29,8 +29,8 @@ set(AVR_UPLOADTOOL_PORT usb)
 set(WITH_MCU ON)
 # AVR and fuses needs to be set
 set(AVR_MCU attiny2313)
-set(AVR_H_FUSE 0xd9)
-set(AVR_L_FUSE 0xc3)
+set(AVR_H_FUSE 0xdf)
+set(AVR_L_FUSE 0xef)
 
 ### END TOOLCHAIN SETUP AREA #############################################
 
