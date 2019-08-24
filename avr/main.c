@@ -24,8 +24,8 @@
 
 #define MESSAGE_LENGTH 8
 #define RCLK PD4
-#define DATA PD0
-#define SRCLK PD1
+#define DATA PD1
+#define SRCLK PD0
 
 #define RAM_WE 0x40
 #define RAM_OE 0x80
