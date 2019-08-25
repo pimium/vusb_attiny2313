@@ -273,8 +273,9 @@ section at the end of this file).
 /* See USB specification if you want to conform to an existing device class.
  * Class 0xff is "vendor specific".
  */
-#define USB_CFG_INTERFACE_CLASS 0 /* define class here if not at device level  \
-                                     */
+#define USB_CFG_INTERFACE_CLASS                                                \
+    0 /* define class here if not at device level                              \
+         */
 #define USB_CFG_INTERFACE_SUBCLASS 0
 #define USB_CFG_INTERFACE_PROTOCOL 0
 /* See USB specification if you want to conform to an existing device class or

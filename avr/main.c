@@ -21,14 +21,16 @@
 #define USB_LED_ON 0x31
 #define USB_DATA_READ 2
 #define USB_DATA_WRITE 3
+#define USB_DATA_READ_DEVICE_CODE 4
 
 #define MESSAGE_LENGTH 8
 #define RCLK PD4
 #define DATA PD1
 #define SRCLK PD0
 
-#define RAM_WE 0x40
-#define RAM_OE 0x80
+#define RAM_WE 0x80
+#define RAM_OE 0x40
+#define RAM_A9 0x20
 #define RAM_CE PD5
 
 void vfd_write_byte(uint8_t byte);
@@ -44,6 +46,7 @@ volatile uchar bytesRemaining;
 USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
 {
     usbRequest_t *rq = (void *)data; // cast data to correct type
+    uint8_t choice = RAM_A9;
 
     switch (rq->bRequest)
     { // custom command is in the bRequest field
@@ -58,6 +61,8 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
             PORTD &= ~(1 << PD5); // turn LED off
         return 0;
 
+    case USB_DATA_READ_DEVICE_CODE: // send data to PC
+        choice = 0;
     case USB_DATA_READ: // send data to PC
 
         PORTD |= (1 << RAM_CE);
@@ -67,7 +72,7 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
         PORTD &= ~(1 << SRCLK);
         PORTD |= (1 << RCLK);
         PORTD &= ~(1 << RCLK);
-        vfd_write_byte(RAM_OE | RAM_WE);
+        vfd_write_byte(RAM_OE | RAM_WE | choice);
         vfd_write_byte(rq->wValue.bytes[1]);
         vfd_write_byte(rq->wValue.bytes[0]);
         PORTD |= (1 << RCLK);
@@ -75,7 +80,7 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
         PORTD &= ~(1 << SRCLK);
         PORTD |= (1 << RCLK);
         PORTD &= ~(1 << RCLK);
-        vfd_write_byte(RAM_WE);
+        vfd_write_byte(RAM_WE | choice);
         vfd_write_byte(rq->wValue.bytes[1]);
         vfd_write_byte(rq->wValue.bytes[0]);
         PORTD &= ~(1 << RAM_CE);
@@ -87,7 +92,7 @@ USB_PUBLIC uchar usbFunctionSetup(uchar data[8])
 
         replyBuf[0] = PINB;
 
-        vfd_write_byte(RAM_OE | RAM_WE);
+        vfd_write_byte(RAM_OE | RAM_WE | choice);
         vfd_write_byte(rq->wValue.bytes[1]);
         vfd_write_byte(rq->wValue.bytes[0]);
         PORTD |= (1 << RCLK);
@@ -121,7 +126,7 @@ USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
     PORTD &= ~(1 << SRCLK);
     PORTD |= (1 << RCLK);
     PORTD &= ~(1 << RCLK);
-    vfd_write_byte(RAM_OE | RAM_WE);
+    vfd_write_byte(RAM_OE | RAM_A9);
     vfd_write_byte(address[1]);
     vfd_write_byte(address[0]);
     PORTD |= (1 << RCLK);
@@ -129,7 +134,7 @@ USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
     PORTD &= ~(1 << SRCLK);
     PORTD |= (1 << RCLK);
     PORTD &= ~(1 << RCLK);
-    vfd_write_byte(RAM_OE);
+    vfd_write_byte(RAM_OE | RAM_WE | RAM_A9);
     vfd_write_byte(address[1]);
     vfd_write_byte(address[0]);
 
@@ -140,7 +145,7 @@ USB_PUBLIC uchar usbFunctionWrite(uchar *data, uchar len)
     PORTD &= ~(1 << SRCLK);
     PORTD |= (1 << RCLK);
     PORTD &= ~(1 << RCLK);
-    vfd_write_byte(RAM_OE | RAM_WE);
+    vfd_write_byte(RAM_OE | RAM_A9);
     vfd_write_byte(address[1]);
     vfd_write_byte(address[0]);
     PORTD |= (1 << RCLK);

@@ -53,11 +53,11 @@ static ssize_t usbcheck_read(struct file *instanz, char *buffer, size_t count,
   __u16 index = (*(bulk_buf + 4) << 8) + *(bulk_buf + 3);
 
   mutex_lock(&ulock); /* Jetzt nicht disconnecten... */
-  retval = usb_control_msg(
-      dev, usb_rcvctrlpipe(dev, 0), bulk_buf[0],
-      // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE,
-      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, value, index,
-      (char *)status, sizeof(status), 5 * HZ);
+  retval =
+      usb_control_msg(dev, usb_rcvctrlpipe(dev, 0), bulk_buf[0],
+                      // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE,
+                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN, value,
+                      index, (char *)status, sizeof(status), 5 * HZ);
 
   if (retval < 0) {
     count = -EIO;
@@ -88,7 +88,6 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   // int wrote_cnt = (cnt - MAX_PKT_SIZE);
   __u8 *bulk_buf = kmalloc(sizeof(__u8) * cnt, GFP_KERNEL);
 
-
   if (copy_from_user(bulk_buf, buf, cnt)) {
     return -EFAULT;
   }
@@ -101,10 +100,9 @@ static ssize_t pen_write(struct file *f, const char __user *buf, size_t cnt,
   // printk("Driver data %s", raw_data);
 
   /* Write the data into the bulk endpoint */
-  retval =
-      usb_control_msg(dev, usb_sndctrlpipe(dev, 0), bulk_buf[0],
-                      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT, value,
-                      index, raw_data, cnt - 5, HZ * 5);
+  retval = usb_control_msg(dev, usb_sndctrlpipe(dev, 0), bulk_buf[0],
+                           USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
+                           value, index, raw_data, cnt - 5, HZ * 5);
   if (retval < 0) {
     printk(KERN_ERR "usb_control_msg returned %d\n", retval);
     return retval;
